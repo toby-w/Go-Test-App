@@ -2,14 +2,14 @@ package main
 
 import (
 	"database/sql" // SQL library
-
-	"github.com/gorilla/mux"
-	_ "github.com/lib/pq" // Drivers for SQL
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 	"encoding/json"
+
+	"github.com/gorilla/mux"
+	_ "github.com/lib/pq" // Drivers for SQL
 )
 
 type App struct {
@@ -30,10 +30,23 @@ func (a *App) Initialize(user, password, dbname, ssl string) {
 
 	// Create router
 	a.Router = mux.NewRouter()
+	a.initializeRoutes()
+
 }
 
-func (a *App) Run(addr string) { }
+func (a *App) Run(addr string) {
+	log.Fatal(http.ListenAndServe(":8000", a.Router))
+}
 
+func (a *App) initializeRoutes() {
+	// Q: What does .Methods() do?
+	// A: Adds a matcher (the path) for the specified HTTP method (ie. "GET") and a handler
+	a.Router.HandleFunc("/products", a.getProducts).Methods("GET")
+	a.Router.HandleFunc("/product", a.createProduct).Methods("POST")
+	a.Router.HandleFunc("/product/{id:[0-9]+}", a.getProduct).Methods("GET")
+	a.Router.HandleFunc("/product/{id:[0-9]+}", a.updateProduct).Methods("PUT")
+	a.Router.HandleFunc("/product/{id:[0-9]+}", a.deleteProduct).Methods("DELETE")
+}
 
 // Response handlers
 

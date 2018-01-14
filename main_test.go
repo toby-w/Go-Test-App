@@ -3,14 +3,14 @@ package main_test
 import (
 	"os"
 	"testing"
-
-	"test_app" // to refer to current directory package, use main
 	"log"
 	"net/http" // TODO: Read through this package
 	"net/http/httptest" // TODO: Read through this package
 	"encoding/json"
 	"bytes"
 	"strconv" // TODO: Read through this package and relevant string operations
+
+	"test_app" // to refer to current directory package, use main
 )
 
 var a main.App
