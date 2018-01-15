@@ -35,7 +35,7 @@ func (a *App) Initialize(user, password, dbname, ssl string) {
 }
 
 func (a *App) Run(addr string) {
-	log.Fatal(http.ListenAndServe(":8000", a.Router))
+	log.Fatal(http.ListenAndServe(addr, a.Router))
 }
 
 func (a *App) initializeRoutes() {
@@ -52,6 +52,7 @@ func (a *App) initializeRoutes() {
 
 func (a *App) getProduct(w http.ResponseWriter, r *http.Request) {
 	// Q: What does this return again?
+	// A: Creates a map of route variables (whatever was allowed to vary in the route)
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {

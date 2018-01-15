@@ -13,4 +13,6 @@ func main() {
 	a.Initialize("postgres", "postgres", "postgres", "disable")
 
 	a.Run(":8080")
+
+	a.DB.Close()
 }

@@ -42,6 +42,9 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
+// Note: A common error is miss typing the Table name in model.go, in all queries, search that they have been corrected
+// 	 including product_id_seq
+
 func TestEmptyTable(t *testing.T) {
 	clearTable()
 
@@ -53,7 +56,7 @@ func TestEmptyTable(t *testing.T) {
 
 	if body := response.Body.String(); body != "[]" {
 		// Q: What is testing.T for?
-		t.Errorf("Ex")
+		t.Errorf("Expected an empty array. Got %s", body)
 	}
 }
 
@@ -76,9 +79,9 @@ func TestGetNonExistentProduct(t *testing.T) {
 func TestCreateProduct(t *testing.T) {
 	clearTable()
 
-	payload := []byte(`{"name":"test product","price":11.22`)
+	// Becareful with JSON object string typo
+	payload := []byte(`{"name":"test product","price":11.22}`)
 
-	// Q: Why need to put body of request into a Buffer?
 	req, _ := http.NewRequest("POST", "/product", bytes.NewBuffer(payload))
 	response := executeRequest(req)
 
@@ -115,7 +118,6 @@ func TestGetProduct(t *testing.T) {
 
 
 func TestUpdateProduct(t *testing.T) {
-	clearTable()
 	addProducts(1)
 
 	req, _ := http.NewRequest("GET", "/product/1", nil)
@@ -123,7 +125,7 @@ func TestUpdateProduct(t *testing.T) {
 	var originalProduct map[string]interface{}
 	json.Unmarshal(response.Body.Bytes(), &originalProduct)
 
-	payload := []byte(`{"name":"test product - updated name","price":11.22`)
+	payload := []byte(`{"name":"test product - updated name","price":11.23}`)
 
 	req, _ = http.NewRequest("PUT", "/product/1", bytes.NewBuffer(payload))
 	response = executeRequest(req)
@@ -173,9 +175,9 @@ func ensureTableExists() {
 }
 
 func clearTable() {
-	a.DB.Exec("DELETE FROM products")
+	a.DB.Exec("DELETE FROM product")
 	// Q: What does this query do?
-	a.DB.Exec("ALTER SEQUENCE products_id_seq RESTART WITH 1")
+	a.DB.Exec("ALTER SEQUENCE product_id_seq RESTART WITH 1")
 }
 
 func addProducts(count int) {
@@ -184,7 +186,7 @@ func addProducts(count int) {
 	}
 
 	for i := 0; i < count; i++ {
-		a.DB.Exec("INSERT INTO products(name, price) VALUES($1, $2)", "Product "+strconv.Itoa(i), (i+1.0)*10)
+		a.DB.Exec("INSERT INTO product(name, price) VALUES($1, $2)", "Product "+strconv.Itoa(i), (i+1.0)*10)
 	}
 }
 
@@ -205,12 +207,14 @@ func checkResponseCode(t *testing.T, expected, actual int) {
 // Q: What're valid SQL types?
 // Q: If default value not specified for non-null, then what is the default value?
 // Q: CONSTRAINT? PRIMARY KEY?
-const tableCreateQuery = `CREATE TABLE product 
+const tableCreateQuery = `
+DROP TABLE product CASCADE;
+CREATE TABLE product 
 (
 id	SERIAL,
 name TEXT NOT NULL,
 price NUMERIC(10,2) NOT NULL DEFAULT 0.00,
-CONSTRAINT products_pkey PRIMARY KEY (id)
+CONSTRAINT product_pkey PRIMARY KEY (id)
 )`
 
 
