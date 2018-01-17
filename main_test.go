@@ -2,7 +2,7 @@ package main_test
 
 import (
 	"os"
-	"testing"
+	"testing" // TODO: Read through this package
 	"log"
 	"net/http" // TODO: Read through this package
 	"net/http/httptest" // TODO: Read through this package
@@ -10,7 +10,7 @@ import (
 	"bytes"
 	"strconv" // TODO: Read through this package and relevant string operations
 
-	"test_app" // to refer to current directory package, use main
+	"test_app" // to refer to current directory package, use main to get the app
 )
 
 var a main.App
